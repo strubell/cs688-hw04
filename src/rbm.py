@@ -1,13 +1,16 @@
 '''
-CS688 HW03: Monte Carlo De-noising
+CS688 HW04: Restricted Boltzmann Machine for handwritten digit recognition
 
-Question 1: Monte Carlo De-noising for binary images
+Implementation of block Gibbs sampling / RBM training using mini-batch
+stochastic gradient ascent
 
 @author: Emma Strubell
 '''
 from __future__ import division
 import numpy as np
 
+# perform block Gibbs sampling given learned parameters for the given number
+# of iterations
 def block_gibbs_sample(w_p, w_b, w_c, d, k, iters, message="", verbose=False):
     print "Block Gibbs sampling %s" % (message)
     xs = np.empty((iters, d))
@@ -31,6 +34,8 @@ def block_gibbs_sample(w_p, w_b, w_c, d, k, iters, message="", verbose=False):
         
     return xs, energies
 
+# train parameters for the given number of iteration using the given
+# learning rate and regularization parameter
 def train_rbm(data, t, k, b, c, alpha, lam):
     n_b, d = data.shape
     n_b //= b
@@ -70,7 +75,10 @@ def train_rbm(data, t, k, b, c, alpha, lam):
             w_p += alpha*(g_wp_pos/n_b - g_wp_neg/c - lam*w_p)
     return w_c, w_b, w_p, xs
 
+# embed the given data instances into the lower-dimensional space defined
+# by the given model parameters
 def compute_embeddings(w_c, w_b, w_p, data):
     return sigmoid(w_b+np.transpose(np.array(np.matrix(w_p)*data.transpose())))
 
+# sigmoid/logistic function: f(x) = 1/(1+exp(-x))
 def sigmoid(x): return 1/(1+np.exp(-x))

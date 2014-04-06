@@ -24,7 +24,7 @@ k = 400 # number of hidden units
 b = 100 # number of batches of data cases
 c = 100 # number of Gibbs chains
 alpha = 0.1  # step size
-lam = 0.0001 # reguarlization param
+lam = 0.0001 # regularization param
 
 def q3ab():
     w_c, w_b, w_p, results, hiddens = rbm.train_rbm(train_instances, t, k, b, c, alpha, lam)
@@ -43,5 +43,4 @@ def q3ab():
     load.write_params(w_p, "MNISTWP400")
 
 q3ab()
-
 plt.show()

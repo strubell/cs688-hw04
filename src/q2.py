@@ -8,6 +8,7 @@ Question 2: Block Gibbs sampling
 
 import numpy as np
 import load_data as load
+import matplotlib.pyplot as plt
 import plotter
 import rbm
 
@@ -21,13 +22,12 @@ print "Loading C params"
 w_c = load.load_params('C')
 
 iterations = 500
-d = 784 # number of input units
-k = 100 # number of hidden units
+d, k = w_p.shape
 
 def q2a():
     interval = 5
     results = rbm.block_gibbs_sample(w_p, w_b, w_c, d, k, iterations, verbose=True)
-    plotter.plot100(results[::interval])
+    plotter.plot100(results[0][::interval])
 
 def q2bc():
     num_chains = 100
@@ -37,7 +37,7 @@ def q2bc():
     plotter.plot100(images[:,-1])
     plotter.plot_energies(energies[:5])
 
-#q2a()
+q2a()
 
 q2bc()
 

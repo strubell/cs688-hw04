@@ -70,4 +70,7 @@ def train_rbm(data, t, k, b, c, alpha, lam):
             w_p += alpha*(g_wp_pos/n_b - g_wp_neg/c - lam*w_p)
     return w_c, w_b, w_p, xs
 
+def compute_embeddings(w_c, w_b, w_p, data):
+    return sigmoid(w_b+np.transpose(np.array(np.matrix(w_p)*data.transpose())))
+
 def sigmoid(x): return 1/(1+np.exp(-x))

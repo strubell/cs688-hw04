@@ -23,4 +23,16 @@ def load_data(type, num_lines=0):
     return np.genfromtxt("%sX%s.txt" % (data_prefix, type), skip_footer=(max_train_size if type == "train" else max_test_size)-num_lines)
 
 def load_labels(type, num_lines=0):
-    return np.genfromtxt("%sY%s.txt" % (data_prefix, type), skip_footer=(max_train_size if type == "train" else max_test_size)-num_lines)-1
+    return np.genfromtxt("%sY%s.txt" % (data_prefix, type), skip_footer=(max_train_size if type == "train" else max_test_size)-num_lines)
+
+def write_params(vec, name): np.savetxt(model_dir+name+".txt", vec)
+
+def write_svmlight(features, labels, fname):
+    file = open(data_dir+fname, 'w')
+    for feats,label in zip(features,labels):
+        file.write("%d " % (label))
+        for idx,feat in enumerate(feats):
+            if(not feat == 0.0):
+                file.write("%d:%g " % (idx+1,feat))
+        file.write("\n")
+    file.close()

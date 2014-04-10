@@ -44,7 +44,64 @@
 \item % Question 1
 \begin{enumerate}
 \item
+We can write the conditional probability $P_W(X=x\mid H=h)$ in terms of the joint probability $P_W(X=x,H=h)$:
+\begin{align*}
+P_W(X=x\mid H=h) &= \frac{P_W(X=x,H=h)}{P_W(H=h)}\\
+&= \frac{\exp(-E_W(x,h))}{\sum_{x'}\sum_{h'}\exp(-E_W(x',h'))} \cdot \frac{\sum_{x'}\sum_{h'}\exp(-E_W(x',h'))}{\sum_{x}\exp(-E_W(x,h))}\\
+&= \frac{\exp(-E_W(x,h))}{\sum_{x}\exp(-E_W(x,h))}\\
+&= \frac{\exp(\sum_d\sum_kW^P_{dk}x_dh_k + \sum_kW^B_kh_k + \sum_dW^C_dx_d)}{\sum_x\exp(\sum_d\sum_kW^P_{dk}x_dh_k + \sum_kW^B_kh_k + \sum_dW^C_dx_d)}\\
+&= \frac{\exp(\sum_d\sum_kW^P_{dk}x_dh_k)\exp(\sum_kW^B_kh_k)\exp(\sum_dW^C_dx_d)}{\sum_x\exp(\sum_d\sum_kW^P_{dk}x_dh_k)\exp(\sum_kW^B_kh_k)\exp(\sum_dW^C_dx_d)}\\
+&= \frac{\exp(\sum_d\sum_kW^P_{dk}x_dh_k)\exp(\sum_dW^C_dx_d)}{\sum_x\exp(\sum_d\sum_kW^P_{dk}x_dh_k)\exp(\sum_dW^C_dx_d)}\\
+&= \frac{\exp(\sum_d\sum_kW^P_{dk}x_dh_k)\exp(\sum_dW^C_dx_d)}{ \exp(0)\exp(0) + \exp(\sum_d\sum_kW^P_{dk}h_k)\exp(\sum_dW^C_d)}\\
+&= \frac{\exp(\sum_d\sum_kW^P_{dk}x_dh_k + \sum_dW^C_dx_d)}{1 + \exp(\sum_d\sum_kW^P_{dk}h_k + \sum_dW^C_d)}\\
+\end{align*}
+
+For a single $x_d$ this further simplifies to:
+\begin{align*}
+P_W(X_d=x_d\mid H=h) &= \frac{\exp(\sum_kW^P_{dk}x_dh_k + W^C_dx_d)}{1 + \exp(\sum_kW^P_{dk}h_k + W^C_d)}
+\end{align*}
+
 \item
+First we take the derivative of the average log likelihood $\mathcal{L}$ with respect to the pairwise parameters $W^P_{ij}$:
+\begin{align*}
+\frac{\partial\mathcal{L}(W\mid x_{1:N})}{\partial W^P_{ij}} = \frac{1}{N}\sum_{n=1}^N \frac{1}{P_W(X=x_n)}\frac{\partial P_W(X=x_n)}{\partial W^P_{ij}}
+\end{align*}
+
+Then the derivative of $P_W(X=x_n)$ with respect to the pairwise parameters $W^P_{ij}$ by applying the quotient rule and simplifying:
+\begin{align*}
+\frac{\partial P_W(X=x_n)}{\partial W^P_{ij}} &= \frac{\sum_{h}\exp\left(-E_W(x_n,h)\right)}{\sum_{x'}\sum_{h'}\exp\left(-E_W(x', h')\right)}\left(\frac{-\partial E_W(x_n,h)}{\partial W^P_{ij}}\right)\\
+&- \frac{\sum_{h}\exp\left(-E_W(x_n,h)\right)}{\left(\sum_{x'}\sum_{h'}\exp\left(-E_W(x', h')\right)\right)^2}\sum_{x'}\sum_{h'}\exp\left(-E_W(x', h')\right)\\
+&\left(\frac{-\partial E_W(x',h')}{\partial W^P_{ij}}\right)\\
+&= \sum_{h}P_W(X=x_n,H=h)\left(\frac{-\partial E_W(x_n,h)}{\partial W^P_{ij}}\right)\\
+&- \sum_{h}P_W(X=x_n,H=h)\sum_{x'}\sum_{h'}P_W(X=x',H=h')\left(\frac{-\partial E_W(x',h')}{\partial W^P_{ij}}\right)\\
+&= \sum_{h}P_W(X=x_n,H=h)\left(\frac{-\partial E_W(x_n,h)}{\partial W^P_{ij}}\right)\\
+&- \sum_{h}P_W(X=x_n,H=h)\sum_{x'}\sum_{h'}\left(\frac{-\partial E_W(x',h')}{\partial W^P_{ij}}\right)
+\end{align*}
+
+And finally the derivative of the energy function $E_W(x_n,h)$ with respect to the pairwise parameters $W^P_{ij}$:
+\begin{align*}
+\frac{\partial E_W(x_n,h)}{\partial W^P_{ij}} &= -\sum_{i=1}^D\sum_{j=1}^Kx_{ni}h_{j}
+\end{align*}
+
+Back-substituting the above into the partial derivative of $P_W(X=x_n)$ with respect to $W^P_{ij}$ gives:
+\begin{align*}
+\frac{\partial P_W(X=x_n)}{\partial W^P_{ij}} &= \sum_{h}P_W(X=x_n,H=h)\sum_{i=1}^D\sum_{j=1}^Kx_{ni}h_{j}\\
+&- \sum_{x'}\sum_{h'}\sum_{i=1}^D\sum_{j=1}^Kx'_{i}h'_{j}
+\end{align*}
+
+And back-substituting the above the partial derivative of the log likelihood with respect to $W^P_{ij}$ gives:
+\begin{align*}
+\frac{\partial\mathcal{L}(W\mid x_{1:N})}{\partial W^P_{ij}} &= \frac{1}{N}\sum_{n=1}^N\Bigg[\frac{1}{P_W(X=x_n)}\sum_{h}P_W(X=x_n,H=h)\sum_{i=1}^D\sum_{j=1}^Kx_{ni}h_{j}\\
+&- \sum_{x'}\sum_{h'}\sum_{i=1}^D\sum_{j=1}^Kx'_{i}h'_{j}\Bigg]\\
+&= \frac{1}{N}\sum_{n=1}^N\Bigg[\sum_h\sum_{i=1}^D\sum_{j=1}^Kx_{ni}h_{j} - \sum_{x'}\sum_{h'}\sum_{i=1}^D\sum_{j=1}^Kx'_{i}h'_{j}\Bigg]
+\end{align*}
+
+Knowing that $x$ and $h$ are each binary, we can expand sums over $x$ and $h$ and cancel 0 terms:
+\begin{align*}
+\frac{\partial\mathcal{L}(W\mid x_{1:N})}{\partial W^P_{ij}} &= \frac{1}{N}\sum_{n=1}^N\Bigg[x_{ni}P_W(h_j = 1 \mid x=x_n) - P_W(X_i = 1, H_j = 1)\Bigg]\\
+&= \frac{1}{N}\sum_{n=1}^N\Bigg[x_{ni}P_W(h_j = 1 \mid x=x_n)\Bigg] - P_W(X_i = 1, H_j = 1)
+\end{align*}
+
 \end{enumerate}
 
 \item % Question 2
@@ -102,7 +159,7 @@ There is definitely structure encoded in these receptive fields. Many consist of
 \item % Question 4
 \begin{enumerate}
 \item Running SVMlight to classify the digits using the lower-dimensional embeddings produced by the RBM with 400 hidden units gives an error rate of 3.71\%.
-\item Running SVMlight to classify the digits using the raw binary representations gives an error rate of 7.88\%; the lower dimensional embeddings work better as features for classification. The raw binary values are probably must noisier, while the embeddings distill less noisy latent structural properties of the digits.
+\item Running SVMlight to classify the digits using the raw binary representations gives an error rate of 7.88\%; the lower dimensional embeddings work better as features for classification. The raw binary values are probably much noisier, while the embeddings distill less noisy latent structural properties of the digits.
 \end{enumerate}
 
 \end{enumerate}
